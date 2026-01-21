@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 
 import routes from "./routes/mainRoutes.js";
 
@@ -12,6 +12,9 @@ const __dirname = dirname(__filename);
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
+// Interface
+import HttpError from "./interface/httpError.js";
+
 const app = express();
 
 app.use(cors());
@@ -23,5 +26,29 @@ app.set("views", path.join(__dirname, "views"));
 
 // ----- ROUTES ----- //
 app.use("/", routes);
+
+// 404 Handler (unrecognized URLs)
+app.use((req, res, next) => {
+	// Check if request expects HTML or JSON
+	if (req.accepts("html")) {
+		return res.status(404).render("notFound"); // Render notFound.ejs
+	}
+	if (req.accepts("json")) {
+		return res.status(404).json({ success: false, message: "Route not found" });
+	}
+	// fallback for plain text
+	res.status(404).type("txt").send("Not Found");
+});
+
+// Global Error Handler
+app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+	const status = err.statusCode || 500;
+
+	res.status(err.statusCode).json({
+		success: false,
+		message: err.message || "Something went wrong",
+		data: err.data || null,
+	});
+});
 
 export default app;
