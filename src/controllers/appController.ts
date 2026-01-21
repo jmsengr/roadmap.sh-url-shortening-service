@@ -7,6 +7,12 @@ const getPage = async (req: Request, res: Response, next: NextFunction) => {
 
 const postUrl = async (req: Request, res: Response, next: NextFunction) => {
 	const serviceResponse = await appService.createShortUrl(req);
+
+	if (false) {
+		res.status(400).json({});
+	}
+
+	res.status(201).json({});
 };
 
-export default { getPage };
+export default { getPage, postUrl };

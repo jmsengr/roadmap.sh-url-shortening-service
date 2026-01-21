@@ -6,7 +6,9 @@ const router = express.Router();
 
 router.get("/", asyncHandler(appController.getPage));
 
-router.post("/shorten");
+router.get("/test", (req, res, next) => res.json({ data: "Test message!" }));
+
+router.post("/shorten", asyncHandler(appController.postUrl));
 
 // router.post("/shorten");
 
