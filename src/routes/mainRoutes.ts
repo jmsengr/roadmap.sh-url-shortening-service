@@ -1,17 +1,11 @@
 import express from "express";
+import appController from "../controllers/appController.js";
+import asyncHandler from "../middleware/asyncWrapper.js";
 
 const router = express.Router();
 
-router.get("/", (req, res, next) => {
-	res.render("../.views/main.ejs");
-});
+router.get("/", asyncHandler(appController.getPage));
 
-router.get("/test", (_req, res, _next) => {
-	res.json({ data: "TEST" });
-});
-
-router.post("/shorten", (req, res, next) => {
-	const url: string = req.url;
-});
+// router.post("/shorten");
 
 export default router;
