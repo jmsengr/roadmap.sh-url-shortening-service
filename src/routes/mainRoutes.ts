@@ -2,6 +2,10 @@ import express from "express";
 
 const router = express.Router();
 
+router.get("/", (req, res, next) => {
+	res.render("../.views/main.ejs");
+});
+
 router.get("/test", (_req, res, _next) => {
 	res.json({ data: "TEST" });
 });

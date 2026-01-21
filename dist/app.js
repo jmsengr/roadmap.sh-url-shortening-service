@@ -1,16 +1,19 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const mainRoutes_1 = __importDefault(require("./routes/mainRoutes"));
+import express from "express";
+import routes from "./routes/mainRoutes.js";
+// dirname & filename
+import { fileURLToPath } from "url";
+import path, { dirname } from "path";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 // NPM Packages
-const cors_1 = __importDefault(require("cors"));
-const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
-app.use(express_1.default.urlencoded({ extended: false }));
-app.use(express_1.default.json());
+import cors from "cors";
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+// dirname
+app.set("view engine", "ejs");
+app.set("view", path.join(__dirname, "views"));
 // ----- ROUTES ----- //
-app.use("/", mainRoutes_1.default);
-exports.default = app;
+app.use("/", routes);
+export default app;
