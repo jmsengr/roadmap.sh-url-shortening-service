@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.get("/", asyncHandler(appController.getPage));
 
+router.post("/shorten");
+
 // router.post("/shorten");
 
 export default router;

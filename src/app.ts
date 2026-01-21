@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 
+// Routes
 import routes from "./routes/mainRoutes.js";
 
 // dirname & filename
@@ -15,10 +16,12 @@ import cookieParser from "cookie-parser";
 // Interface
 import HttpError from "./interface/httpError.js";
 
+// SEQUENCE STARTING POINT //
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
 app.set("view engine", "ejs");
