@@ -11,7 +11,13 @@ const createShortUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 	});
 
 	if (stored_url) {
-		return { success: false, error: "URL already exists" };
+		return {
+			success: true,
+			data: {
+				url: stored_url.url,
+				shortCode: stored_url.shortCode,
+			},
+		};
 	}
 
 	// Creates new code key
@@ -39,4 +45,24 @@ const createShortUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 	};
 };
 
-export default { createShortUrl };
+const getOriginalUrl = async (req: Request): Promise<ServiceResponse<{ url: string; shortCode: string }>> => {
+	const { code } = req.params;
+
+	const stored_url = await prisma.url.findFirst({
+		where: { shortCode: code as string },
+	});
+
+	if (!stored_url) {
+		return { success: false, error: "The link is invalid or expired" };
+	}
+
+	return {
+		success: true,
+		data: {
+			url: stored_url.url,
+			shortCode: stored_url.shortCode,
+		},
+	};
+};
+
+export default { createShortUrl, getOriginalUrl };

@@ -4,7 +4,7 @@ const getPage = async (req, res, next) => {
 };
 const postUrl = async (req, res, next) => {
     const serviceResponse = await appService.createShortUrl(req);
-    if (false) {
+    if (serviceResponse) {
         res.status(400).json({});
     }
     res.status(201).json({});

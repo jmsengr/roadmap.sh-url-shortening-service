@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
 	const status = err.statusCode || 500;
 
-	res.status(err.statusCode).json({
+	res.status(err.statusCode as number).json({
 		success: false,
 		message: err.message || "Something went wrong",
 		data: err.data || null,
