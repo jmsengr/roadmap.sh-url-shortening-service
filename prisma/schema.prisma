@@ -16,7 +16,7 @@ datasource db {
 model Url {
   id          String   @id @default(uuid())
   url         String
-  shortCode   String
+  shortCode   String   @unique
   createdAt   DateTime
   updatedAt   DateTime
   accessCount Int

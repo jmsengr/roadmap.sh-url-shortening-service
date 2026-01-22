@@ -53,7 +53,7 @@ const getOriginalUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 	});
 
 	if (!stored_url) {
-		return { success: false, error: "The link is invalid or expired" };
+		return { success: false, error: "The shortened url is invalid or expired" };
 	}
 
 	return {
@@ -65,4 +65,31 @@ const getOriginalUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 	};
 };
 
-export default { createShortUrl, getOriginalUrl };
+const updateShortUrl = async (req: Request): Promise<ServiceResponse<{ url: string; shortCode: string }>> => {
+	const { code } = req.params;
+	const { url } = req.body;
+
+	const stored_url = await prisma.url.findFirst({ where: { shortCode: code as string } });
+
+	if (!stored_url) {
+		return { success: false, error: `${code} code for shortened url does not exists, cannot update` };
+	}
+
+	const updatedShortenedUrl = await prisma.url.update({
+		where: { shortCode: code as string },
+		data: {
+			url: url,
+			updatedAt: new Date(),
+		},
+	});
+
+	return {
+		success: true,
+		data: {
+			url: updatedShortenedUrl.url,
+			shortCode: updatedShortenedUrl.shortCode,
+		},
+	};
+};
+
+export default { createShortUrl, getOriginalUrl, updateShortUrl };
