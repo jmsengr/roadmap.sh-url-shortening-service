@@ -12,6 +12,7 @@ const createShortUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 
 	if (stored_url) {
 		return {
+			statusCode: 201,
 			success: true,
 			data: {
 				url: stored_url.url,
@@ -37,6 +38,7 @@ const createShortUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 	});
 
 	return {
+		statusCode: 200,
 		success: true,
 		data: {
 			url: shortenUrl.url,
@@ -53,10 +55,11 @@ const getOriginalUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 	});
 
 	if (!stored_url) {
-		return { success: false, error: "The shortened url is invalid or expired" };
+		return { statusCode: 404, success: false, error: "The shortened url is not found or expired" };
 	}
 
 	return {
+		statusCode: 200,
 		success: true,
 		data: {
 			url: stored_url.url,

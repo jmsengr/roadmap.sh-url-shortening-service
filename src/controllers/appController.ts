@@ -9,10 +9,10 @@ const postUrl = async (req: Request, res: Response, next: NextFunction) => {
 	const serviceResponse = await appService.createShortUrl(req);
 
 	if (!serviceResponse.success) {
-		return res.status(400).json(serviceResponse);
+		return res.status(serviceResponse.statusCode).json(serviceResponse);
 	}
 
-	return res.status(201).json(serviceResponse);
+	return res.status(serviceResponse.statusCode).json(serviceResponse);
 };
 
 const getOriginalUrl = async (req: Request, res: Response, next: NextFunction) => {
