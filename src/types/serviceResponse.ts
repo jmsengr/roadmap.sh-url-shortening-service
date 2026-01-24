@@ -1,8 +1,6 @@
-type ServiceResponse<T> = {
-	success: boolean;
-	data?: T;
-	error?: string;
-	statusCode: number;
-};
+type ServiceResponse<T> =
+  | { type: 'create' | 'read' | 'update' | 'delete'; data: T }      // Operation succeeded
+  | { type: 'failure'; error: string }; // Operation failed
 
 export default ServiceResponse;
+

@@ -8,33 +8,37 @@ const getPage = async (req: Request, res: Response, next: NextFunction) => {
 const postUrl = async (req: Request, res: Response, next: NextFunction) => {
 	const serviceResponse = await appService.createShortUrl(req);
 
-	if (!serviceResponse.success) {
-		return res.status(serviceResponse.statusCode).json(serviceResponse);
+	switch (serviceResponse.type) {
+		case 'failure':
+			return res.status(400).json({ success: false, error: serviceResponse.error });
+		case 'create':
+			return res.status(201).json({ success: true, data: serviceResponse.data });
+		case 'read':
+			return res.status(200).json({ success: true, data: serviceResponse.data });
 	}
-
-	return res.status(serviceResponse.statusCode).json(serviceResponse);
 };
 
 const getOriginalUrl = async (req: Request, res: Response, next: NextFunction) => {
 	const serviceResponse = await appService.getOriginalUrl(req);
 
-	if (!serviceResponse.success) {
-		return res.status(404).json(serviceResponse);
+	switch (serviceResponse.type) {
+		case 'failure':
+			return res.status(404).json({ success: false, error: serviceResponse.error });
+		case 'read':
+			const originalUrl: string = serviceResponse.data.url;
+			return res.status(200).redirect(originalUrl);
 	}
 
-	const originalUrl: string | undefined = serviceResponse.data?.url;
-
-	if (!originalUrl) {
-		return res.status(404).json({ success: false, error: "Original url not found" });
-	}
-
-	return res.status(200).redirect(originalUrl);
 };
 
 const updateShortUrl = async (req: Request, res: Response, next: NextFunction) => {
 	const serviceResponse = await appService.updateShortUrl(req);
 
-	if (!serviceResponse.success) {
+	switch (serviceResponse.type) {
+		case 'failure':
+			return res.status(400).json({ success: false, error: serviceResponse.error });
+		case 'update':
+			return res.status(201).json({ success: true, data: serviceResponse.data });
 	}
 };
 

@@ -10,10 +10,10 @@ const createShortUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 		where: { url: url },
 	});
 
+	// URL Already exists
 	if (stored_url) {
 		return {
-			statusCode: 201,
-			success: true,
+			type: 'read',
 			data: {
 				url: stored_url.url,
 				shortCode: stored_url.shortCode,
@@ -38,8 +38,7 @@ const createShortUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 	});
 
 	return {
-		statusCode: 200,
-		success: true,
+		type: 'create',
 		data: {
 			url: shortenUrl.url,
 			shortCode: shortenUrl.shortCode,
@@ -54,13 +53,14 @@ const getOriginalUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 		where: { shortCode: code as string },
 	});
 
+	
+
 	if (!stored_url) {
-		return { statusCode: 404, success: false, error: "The shortened url is not found or expired" };
+		return { type: 'failure', error: "The shortened url is not found or expired" };
 	}
 
 	return {
-		statusCode: 200,
-		success: true,
+		type: 'read',
 		data: {
 			url: stored_url.url,
 			shortCode: stored_url.shortCode,
@@ -75,7 +75,7 @@ const updateShortUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 	const stored_url = await prisma.url.findFirst({ where: { shortCode: code as string } });
 
 	if (!stored_url) {
-		return { success: false, error: `${code} code for shortened url does not exists, cannot update` };
+		return { type: 'failure', error: `${code} code for shortened url does not exists, cannot update` };
 	}
 
 	const updatedShortenedUrl = await prisma.url.update({
@@ -87,7 +87,7 @@ const updateShortUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 	});
 
 	return {
-		success: true,
+		type: 'update',
 		data: {
 			url: updatedShortenedUrl.url,
 			shortCode: updatedShortenedUrl.shortCode,
