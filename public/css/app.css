@@ -126,19 +126,22 @@ hr {
 }
 
 #result {
-	font-size: 0.95rem;
-	font-weight: 500;
-	word-break: break-all;
-	color: #38bdf8;
-	background: rgba(56, 189, 248, 0.1);
-	padding: 0.6rem 0.75rem;
-	border-radius: 8px;
-	border: 1px dashed rgba(56, 189, 248, 0.4);
-	min-height: 2.25rem;
-	display: flex;
-    flex-direction: row;
-	align-items: center;
-	justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 500;
+    word-break: break-all;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    border: 1px dashed rgba(56, 189, 248, 0.4);
+    min-height: 2.25rem;
+
+    /* Flex container stacking vertically */
+    display: flex;
+    flex-direction: column; /* <-- change from row to column */
+    align-items: center;    /* center horizontally */
+    justify-content: flex-start; /* start from top */
+    gap: 0.5rem; /* optional spacing between items */
 }
 
 /* ================================

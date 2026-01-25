@@ -31,23 +31,24 @@ document.getElementById("main-form").addEventListener("submit", async (e) => {
             const resultElement = document.getElementById("result");
 
             const liTemplate = 
-            `<li class="result-item">
+            `<li class="result-item" style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; margin-bottom: 0.5rem;">
                 <p>http://localhost:3000/shorten/${shortCode}</p>
-                <button class="copy-btn">Copy</button>
+                <button class="copy-btn"  style="background: none; border: none; padding: 0; cursor: pointer; color: #38bdf8; font-size: 1rem;">📋</button>
             </li>
             `;
 
             resultElement.insertAdjacentHTML("beforeend", liTemplate);
 
+            // Fetched the last button
             const lastButton = resultElement.lastElementChild.querySelector(".copy-btn");
 
             if(!lastButton) return;
 
             lastButton.addEventListener("click", (e) => {
                 navigator.clipboard.writeText(`http://localhost:3000/shorten/${shortCode}`);
-                e.target.textContent = "Copied!";
+                e.target.textContent = "✅";
                 setTimeout(() => {
-                    e.target.textContent = "Copy";
+                    e.target.textContent = "📋";
                 }, 2000);
             })
 
