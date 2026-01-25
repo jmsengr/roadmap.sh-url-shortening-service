@@ -33,26 +33,26 @@ app.use("/", routes);
 
 // 404 Handler (unrecognized URLs)
 app.use((req, res, next) => {
-	// Check if request expects HTML or JSON
-	if (req.accepts("html")) {
-		return res.status(404).render("notFound"); // Render notFound.ejs
-	}
-	if (req.accepts("json")) {
-		return res.status(404).json({ success: false, message: "Route not found" });
-	}
-	// fallback for plain text
-	res.status(404).type("txt").send("Not Found");
+    // Check if request expects HTML or JSON
+    if (req.accepts("html")) {
+        return res.status(404).render("notFound"); // Render notFound.ejs
+    }
+    if (req.accepts("json")) {
+        return res.status(404).json({ success: false, message: "Route not found" });
+    }
+    // fallback for plain text
+    res.status(404).type("txt").send("Not Found");
 });
 
 // Global Error Handler
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
-	const status = err.statusCode || 500;
+    const status = err.statusCode || 500;
 
-	res.status(err.statusCode as number).json({
-		success: false,
-		message: err.message || "Something went wrong",
-		data: err.data || null,
-	});
+    res.status(err.statusCode as number).json({
+        success: false,
+        message: err.message || "Something went wrong",
+        data: err.data || null,
+    });
 });
 
 export default app;

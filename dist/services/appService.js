@@ -1,7 +1,13 @@
 import prisma from "../database/prisma.js";
 import { generateCode } from "../utils/utils.js";
+import axios from "axios";
 const createShortUrl = async (req) => {
     const { url } = req.body;
+    // Validate URL reachability
+    const valid_site = await axios.get(url).then(() => true).catch(() => false);
+    if (!valid_site) {
+        return { type: 'failure', error: "The provided URL is not reachable. Please provide a valid URL." };
+    }
     const stored_url = await prisma.url.findFirst({
         where: { url: url },
     });

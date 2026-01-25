@@ -2,97 +2,144 @@ import type { Request } from "express";
 import prisma from "../database/prisma.js";
 import { generateCode } from "../utils/utils.js";
 import type ServiceResponse from "../types/serviceResponse.js";
+import axios from "axios";
 
 const createShortUrl = async (req: Request): Promise<ServiceResponse<{ url: string; shortCode: string }>> => {
-	const { url } = req.body;
+    const { url } = req.body;
 
-	const stored_url = await prisma.url.findFirst({
-		where: { url: url },
-	});
+    // Validate URL reachability
+    const valid_site = await axios
+        .get(url)
+        .then(() => true)
+        .catch(() => false);
 
-	// URL Already exists
-	if (stored_url) {
-		return {
-			type: 'read',
-			data: {
-				url: stored_url.url,
-				shortCode: stored_url.shortCode,
-			},
-		};
-	}
+    if (!valid_site) {
+        return {
+            type: "failure",
+            error: "The provided URL is not reachable. Please provide a valid URL.",
+        };
+    }
 
-	// Creates new code key
-	let new_code: string = generateCode();
-	while (await prisma.url.findFirst({ where: { shortCode: new_code } })) {
-		new_code = generateCode();
-	}
+    const stored_url = await prisma.url.findFirst({
+        where: { url: url },
+    });
 
-	const shortenUrl = await prisma.url.create({
-		data: {
-			url: url,
-			shortCode: new_code,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			accessCount: 0,
-		},
-	});
+    // URL Already exists
+    if (stored_url) {
+        return {
+            type: "read",
+            data: {
+                url: stored_url.url,
+                shortCode: stored_url.shortCode,
+            },
+        };
+    }
 
-	return {
-		type: 'create',
-		data: {
-			url: shortenUrl.url,
-			shortCode: shortenUrl.shortCode,
-		},
-	};
+    // Creates new code key
+    let new_code: string = generateCode();
+    while (await prisma.url.findFirst({ where: { shortCode: new_code } })) {
+        new_code = generateCode();
+    }
+
+    const shortenUrl = await prisma.url.create({
+        data: {
+            url: url,
+            shortCode: new_code,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            accessCount: 0,
+        },
+    });
+
+    return {
+        type: "create",
+        data: {
+            url: shortenUrl.url,
+            shortCode: shortenUrl.shortCode,
+        },
+    };
 };
 
 const getOriginalUrl = async (req: Request): Promise<ServiceResponse<{ url: string; shortCode: string }>> => {
-	const { code } = req.params;
+    const { code } = req.params;
 
-	const stored_url = await prisma.url.findFirst({
-		where: { shortCode: code as string },
-	});
+    const stored_url = await prisma.url.findFirst({
+        where: { shortCode: code as string },
+    });
 
-	
+    if (!stored_url) {
+        return {
+            type: "failure",
+            error: "The shortened url is not found or expired",
+        };
+    }
 
-	if (!stored_url) {
-		return { type: 'failure', error: "The shortened url is not found or expired" };
-	}
-
-	return {
-		type: 'read',
-		data: {
-			url: stored_url.url,
-			shortCode: stored_url.shortCode,
-		},
-	};
+    return {
+        type: "read",
+        data: {
+            url: stored_url.url,
+            shortCode: stored_url.shortCode,
+        },
+    };
 };
 
 const updateShortUrl = async (req: Request): Promise<ServiceResponse<{ url: string; shortCode: string }>> => {
-	const { code } = req.params;
-	const { url } = req.body;
+    const { code } = req.params;
+    const { url } = req.body;
 
-	const stored_url = await prisma.url.findFirst({ where: { shortCode: code as string } });
+    const stored_url = await prisma.url.findFirst({
+        where: { shortCode: code as string },
+    });
 
-	if (!stored_url) {
-		return { type: 'failure', error: `${code} code for shortened url does not exists, cannot update` };
-	}
+    if (!stored_url) {
+        return {
+            type: "failure",
+            error: `${code} code for shortened url does not exists, cannot update`,
+        };
+    }
 
-	const updatedShortenedUrl = await prisma.url.update({
-		where: { shortCode: code as string },
-		data: {
-			url: url,
-			updatedAt: new Date(),
-		},
-	});
+    const updatedShortenedUrl = await prisma.url.update({
+        where: { shortCode: code as string },
+        data: {
+            url: url,
+            updatedAt: new Date(),
+        },
+    });
 
-	return {
-		type: 'update',
-		data: {
-			url: updatedShortenedUrl.url,
-			shortCode: updatedShortenedUrl.shortCode,
-		},
-	};
+    return {
+        type: "update",
+        data: {
+            url: updatedShortenedUrl.url,
+            shortCode: updatedShortenedUrl.shortCode,
+        },
+    };
 };
 
-export default { createShortUrl, getOriginalUrl, updateShortUrl };
+const deleteShortUrl = async (req: Request): Promise<ServiceResponse<null>> => {
+    const { code } = req.params;
+
+    const stored_url = await prisma.url.findFirst({
+        where: { shortCode: code as string },
+    });
+
+    if (!stored_url) {
+        return {
+            type: "failure",
+            error: `${code} code for shortened url does not exists, cannot delete`,
+        };
+    }
+
+    await prisma.url.delete({ where: { shortCode: code as string } });
+
+    return {
+        type: "delete",
+        data: null,
+    };
+};
+
+export default {
+    createShortUrl,
+    getOriginalUrl,
+    updateShortUrl,
+    deleteShortUrl,
+};

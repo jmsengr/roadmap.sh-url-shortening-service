@@ -12,6 +12,6 @@ router.post("/shorten", asyncHandler(appController.postUrl));
 
 router.get("/shorten/:code", asyncHandler(appController.getOriginalUrl));
 
-// router.post("/shorten");
+router.delete("/shorten/:code", asyncHandler(appController.deleteShortUrl));
 
 export default router;
