@@ -33,11 +33,15 @@ document.getElementById("main-form").addEventListener("submit", async (e) => {
 
         const resultElement = document.getElementById("result");
 
-        const liTemplate = `<li class="result-item" style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; margin-bottom: 0.5rem;">
+        const liTemplate = `<li class="result-item" style="  width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; font-size: 1rem; margin-bottom: 0.5rem; flex-wrap: wrap; margin: 0; flex: 1 1 100%; word-break: break-all;">
                 <p>http://localhost:3000/shorten/${shortCode}</p>
-                <button class="copy-btn"  style="background: none; border: none; padding: 0; cursor: pointer; color: #38bdf8; font-size: 1rem;">📋</button>
-                <button class="copy-btn"  style="background: none; border: none; padding: 0; cursor: pointer; color: #38bdf8; font-size: 1rem;">❌</button>
-                <button class="copy-btn"  style="background: none; border: none; padding: 0; cursor: pointer; color: #38bdf8; font-size: 1rem;">📊</button>
+
+                <div style="display: flex; flex-direction: row; gap: 0.5rem; align-items: center;" >
+                    <button class="copy-btn"  style="background: none; border: none; padding: 0; cursor: pointer; color: #38bdf8; font-size: 1rem;">📋</button>
+                    <button class="copy-btn"  style="background: none; border: none; padding: 0; cursor: pointer; color: #38bdf8; font-size: 1rem;">❌</button>
+                    <button class="copy-btn"  style="background: none; border: none; padding: 0; cursor: pointer; color: #38bdf8; font-size: 1rem;">📊</button>
+                </div>
+
             </li>
             `;
 
