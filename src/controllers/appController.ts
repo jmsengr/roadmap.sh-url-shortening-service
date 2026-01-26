@@ -52,7 +52,16 @@ const deleteShortUrl = async (req: Request, res: Response, next: NextFunction) =
     }
 };
 
-const getUrlStatistics = async (req: Request, res: Response, next: NextFunction) => {};
+const getUrlStatistics = async (req: Request, res: Response, next: NextFunction) => {
+    const serviceResponse = await appService.getUrlStatistics(req);
+
+    switch (serviceResponse.type) {
+        case "failure":
+            return res.status(404).json({ success: false, error: serviceResponse.error });
+        case "read":
+            return res.status(200).json({ success: true, data: serviceResponse.data });
+    }
+};
 
 export default {
     getPage,

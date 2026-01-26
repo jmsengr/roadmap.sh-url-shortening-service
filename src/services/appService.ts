@@ -3,6 +3,7 @@ import prisma from "../database/prisma.js";
 import { generateCode } from "../utils/utils.js";
 import type ServiceResponse from "../types/serviceResponse.js";
 import axios from "axios";
+import { access } from "node:fs";
 
 const createShortUrl = async (req: Request): Promise<ServiceResponse<{ url: string; shortCode: string }>> => {
     const { url } = req.body;
@@ -26,6 +27,14 @@ const createShortUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
 
     // URL Already exists
     if (stored_url) {
+        await prisma.url.update({
+            where: { shortCode: stored_url.shortCode },
+            data: {
+                updatedAt: new Date(),
+                accessCount: stored_url.accessCount + 1,
+            },
+        });
+
         return {
             type: "read",
             data: {
@@ -74,6 +83,14 @@ const getOriginalUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
         };
     }
 
+    await prisma.url.update({
+        where: { shortCode: code as string },
+        data: {
+            accessCount: stored_url.accessCount + 1,
+            updatedAt: new Date(),
+        },
+    });
+
     return {
         type: "read",
         data: {
@@ -103,6 +120,7 @@ const updateShortUrl = async (req: Request): Promise<ServiceResponse<{ url: stri
         data: {
             url: url,
             updatedAt: new Date(),
+            accessCount: stored_url.accessCount + 1,
         },
     });
 
@@ -137,9 +155,36 @@ const deleteShortUrl = async (req: Request): Promise<ServiceResponse<null>> => {
     };
 };
 
+const getUrlStatistics = async (
+    req: Request,
+): Promise<ServiceResponse<{ originalUrl: string; shortenUrl: string; accessCount: number }>> => {
+    const { code } = req.params;
+
+    const stored_url = await prisma.url.findFirst({
+        where: { shortCode: code as string },
+    });
+
+    if (!stored_url) {
+        return {
+            type: "failure",
+            error: `Statistics for url code ${code} not found`,
+        };
+    }
+
+    return {
+        type: "read",
+        data: {
+            originalUrl: stored_url.url,
+            shortenUrl: `http://localhost:3000/shorten/${stored_url.shortCode}`,
+            accessCount: Number(stored_url.accessCount),
+        },
+    };
+};
+
 export default {
     createShortUrl,
     getOriginalUrl,
     updateShortUrl,
     deleteShortUrl,
+    getUrlStatistics,
 };

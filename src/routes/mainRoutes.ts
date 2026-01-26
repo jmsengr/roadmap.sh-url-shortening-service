@@ -14,4 +14,6 @@ router.get("/shorten/:code", asyncHandler(appController.getOriginalUrl));
 
 router.delete("/shorten/:code", asyncHandler(appController.deleteShortUrl));
 
+router.get("/shorten/:code/stats", asyncHandler(appController.getUrlStatistics));
+
 export default router;
